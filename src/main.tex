@@ -1,27 +1,190 @@
-% Preamble
-\documentclass[11pt]{article}
-
-% Packages
-\usepackage[top=2.54cm, bottom=2.54cm, right=2.54cm, left=2.54cm]{geometry}
+\documentclass[aspectratio=169]{beamer}
+ 
+\usepackage[utf8]{inputenc}
 \usepackage{lipsum}
-\usepackage{graphicx}
-\usepackage{xcolor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set Helvetica Font in Text and Math in LaTeX %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[helvet]{sfmath}
+\usepackage[scaled=1]{helvet}
+\usepackage[T1]{fontenc}
+\renewcommand\familydefault{\sfdefault} 
+\everymath={\sf}
+\usepackage{fontspec}
+
+\usepackage{subcaption}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+
+% use settings files
+\input{configuration_files/beamer_theme.tex}
+\input{configuration_files/quotations.tex}
+
+% Other packages
+\usepackage{enumitem}
+\setitemize{label=\usebeamerfont*{itemize item}%
+  \usebeamercolor[fg]{itemize item}
+  \usebeamertemplate{itemize item}}
+
+\usepackage{amssymb}
+\newcommand*{\QEDA}{\hfill\ensuremath{\blacksquare}}
+
 \usepackage{datetime}
 \newdateformat{specialdate}{\twodigit{\THEDAY} \ \monthname[\THEMONTH] \THEYEAR}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage[pdfusetitle]{hyperref}
+\newcommand{\nologo}{\setbeamertemplate{logo}{}}
+\newcommand{\yeslogo}{\logo{\includegraphics[width=1.5cm]{./images/ru_logo_transparent}}}
 
-\author{AUTHOR}
-\title{TEMPLATE}
+\yeslogo
+
+\newif\ifpause
+\pausetrue
+%\pausefalse
+\newcommand{\mypause}{\ifpause \pause \fi}
+
+%Information to be included in the title page:
+\title{Flash Talk: Autonomous Drone Landing}
+\author{Joshua Springer}
+\institute{Reykjavík University\\Department of Computer Science}
+
 \date{\specialdate\today}
 
 \begin{document}
-    \maketitle
 
-    \section{Introduction}
-    \input{sections/introduction.tex}
+\maketitle
 
-    \bibliography{main}
-    \bibliographystyle{plain}
+\begin{frame}{Overview}
+	\begin{itemize}
+		\item Drone flight -- largely automated\\\mypause... except for landing
+		\mypause
+		\item Landing -- hard and risky\mypause\\GPS is not precise enough\\Beacons require extra infrastructure
+		\mypause
+		\item Focus: efficient processing, passive ground infrastructure
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Part 1: Fiducial Markers}
+    \begin{columns}
+        \begin{column}{0.37\textwidth}
+		\vspace{1cm}
+		\begin{figure}[]
+		    \centering
+		    \begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=\textwidth]{./images/whycode_multi}
+			\label{figure:whycode_bundle}
+		    \end{subfigure}
+		    \begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=\textwidth]{./images/tagCustom24h10_00002_00001_00000}
+			\label{figure:apriltag24h10}
+		    \end{subfigure}
+
+		    \begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=\textwidth]{./images/whycode_20_8}
+			\label{figure:whycode_single}
+		    \end{subfigure}
+		    \begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=\textwidth]{./images/tagCustom48h12_00002_00001_00000}
+			\label{figure:apriltag48h12}
+		    \end{subfigure}
+		    \label{figure:marker_setup}
+		\end{figure}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+		\begin{itemize}
+			\item Passive
+			\item \emph{Theoretically} only need a monocular camera\mypause\\Orientation ambiguity problem
+			\item Fixed-camera paradigm
+			\item Contribution: moving-camera paradigm (\href{https://vimeo.com/664863992}{Video})
+			\item Next: use orientation from camera IMU (unambiguous)
+		\end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Part 2: Terrain Analysis}
+    \begin{columns}
+        \begin{column}{0.37\textwidth}
+		\vspace{0.10cm}
+		\begin{figure}[]
+		    \centering
+		    \begin{subfigure}[b]{0.9\linewidth}
+			\includegraphics[width=\textwidth]{./images/lava_rough}
+			\label{figure:whycode_bundle}
+		    \end{subfigure}
+		    \begin{subfigure}[b]{0.9\linewidth}
+			\includegraphics[width=\textwidth]{./images/lava_smooth}
+			\label{figure:apriltag24h10}
+		    \end{subfigure}
+		\end{figure}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+		\begin{itemize}
+			\item More flexible
+			\mypause
+			\item Application: Mars exploration/geology\mypause\\(RAVEN, analog research)
+			\item Solidified lava flows
+			\mypause
+			\item D455 Depth Camera
+			\item Google Coral, Jetson Nano, Raspberry Pi
+		\end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\nologo
+\begin{frame}{Depth Drone}
+	\vspace{0.5cm}
+	\begin{figure}[]
+	    \centering
+	    \begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[height=6cm]{./images/depth_drone}
+		\label{figure:whycode_bundle}
+	    \end{subfigure}
+		\mypause
+		\hfill
+	    \begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[height=6cm]{./images/depth_drone_flying}
+		\label{figure:apriltag24h10}
+	    \end{subfigure}
+		\mypause
+		\hfill
+	    \begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[height=6cm]{./images/depth_drone_flying}
+		\label{figure:apriltag24h10}
+	    \end{subfigure}
+	\end{figure}
+
+	\vspace{-1cm}
+	\href{https://photos.google.com/share/AF1QipNXTuJ1jwBbWXkfmRTWAf_jNwcutEZrpX_9k5u5lWiPdUfPsY21TfGQF_UkUXHqSA/photo/AF1QipPmBs1g8-xC1YvqdGMdKUgzxI1iednbFL9lDDPQ?key=Q1RjLVUybUlUUlB6ZlNHR1Z1WXRYTmhsb1Z2S1pR}{Video}
+
+\end{frame}
+
+\begin{frame}{Ask me questions}
+	\vspace{0.5cm}
+	\begin{figure}[]
+	    \centering
+		\includegraphics[height=3cm]{./images/tagCustom24h10_00002_00001_00000}
+		\hfill
+		\includegraphics[height=3cm]{./images/whycode_20_8}
+		\hfill
+		\includegraphics[height=3cm]{./images/demo_screenshot}\\
+		\includegraphics[height=3cm]{./images/lava_smooth}
+		\hfill
+		\includegraphics[height=3cm]{./images/depth_drone_flying}
+		\hfill
+		\includegraphics[height=3cm]{./images/depth_data}
+	\end{figure}
+\end{frame}
+
+
 
 \end{document}
